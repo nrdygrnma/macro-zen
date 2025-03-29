@@ -11,19 +11,16 @@ export function useAutoStepFocus(
 
     if (!ref) return;
 
-    // Case 1: UInput or similar (with .inputRef)
     if (ref.inputRef) {
       ref.inputRef.focus();
       return;
     }
 
-    // Case 2: Plain DOM element or custom wrapper with focus
     if (typeof ref.focus === "function") {
       ref.focus();
       return;
     }
 
-    // Case 3: Component with a focusable child (e.g., URadioGroup)
     const focusable = ref.$el?.querySelector?.(
       "[tabindex], input, button, [data-focusable]",
     );

@@ -66,9 +66,9 @@
           <li><strong>Goal Weight:</strong> {{ form.goalWeight }} kg</li>
           <li><strong>Age:</strong> {{ form.age }}</li>
           <li><strong>Height:</strong> {{ form.height }} cm</li>
-          <li><strong>Sex:</strong> {{ form.sex }}</li>
-          <li><strong>Activity:</strong> {{ form.activity }}</li>
-          <li><strong>Goal:</strong> {{ form.goal }}</li>
+          <li><strong>Sex:</strong> {{ toTitleCase(form.sex) }}</li>
+          <li><strong>Activity:</strong> {{ toTitleCase(form.activity) }}</li>
+          <li><strong>Goal:</strong> {{ toTitleCase(form.goal) }}</li>
           <li>
             <strong>Fasting:</strong>
             {{ form.fasting ? form.fastingMethod : "No" }}
@@ -90,6 +90,11 @@
 
 <script lang="ts" setup>
 import type { RadioGroupItem, StepperItem } from "@nuxt/ui";
+import { toTitleCase } from "~/utils/textUtils";
+
+definePageMeta({
+  layout: "onboarding",
+});
 
 const user = useUserStore();
 const weightInput = ref();
@@ -97,6 +102,9 @@ const ageInput = ref();
 const activityRef = ref();
 const goalRef = ref();
 const fastingRef = ref();
+
+const toast = useToast();
+const router = useRouter();
 
 const stepItems = ref<StepperItem[]>([
   {
@@ -187,7 +195,13 @@ const nextStep = () => {
     Object.assign(user, form);
     step.value++;
   } else {
-    console.log("Onboarding complete ✅");
+    toast.add({
+      title: "Welcome to MacroZen 🎉",
+      description: "Setup complete!",
+      color: "green",
+    });
+    localStorage.removeItem("onboarding-progress");
+    router.push("/");
   }
 };
 
@@ -199,5 +213,28 @@ const canContinue = computed(() => {
   if (step.value === 4) return !!form.goal;
   if (step.value === 5) return !form.fasting || !!form.fastingMethod;
   return true;
+});
+
+watch(
+  [step, form],
+  () => {
+    localStorage.setItem(
+      "onboarding-progress",
+      JSON.stringify({
+        step: step.value,
+        data: { ...form },
+      }),
+    );
+  },
+  { deep: true },
+);
+
+onMounted(() => {
+  const saved = localStorage.getItem("onboarding-progress");
+  if (saved) {
+    const { step: savedStep, data } = JSON.parse(saved);
+    Object.assign(form, data);
+    step.value = savedStep;
+  }
 });
 </script>
