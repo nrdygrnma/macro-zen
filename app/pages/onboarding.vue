@@ -2,9 +2,13 @@
   <UContainer
     class="w-full max-w-xl mx-auto p-8 border border-gray-200 rounded-lg"
   >
-    <UStepper :items="stepItems" :model-value="step" class="w-full mb-8" />
+    <UStepper
+      :items="stepItems"
+      :model-value="step"
+      @update:model-value="handleStepClick"
+    />
 
-    <div class="min-h-[300px]">
+    <div class="min-h-[300px] mt-8">
       <component :is="currentStepComponent" ref="stepRef" />
     </div>
 
@@ -21,14 +25,8 @@
 <script lang="ts" setup>
 import { useAutoStepFocus } from "~/composables/useAutoStepFocus";
 import { useOnboardingValidation } from "~/composables/useOnboardingValidation";
-
-import StepWelcome from "~/components/onboarding/StepWelcome.vue";
-import StepWeight from "~/components/onboarding/StepWeight.vue";
-import StepBasicInfo from "~/components/onboarding/StepBasicInfo.vue";
-import StepActivity from "~/components/onboarding/StepActivity.vue";
-import StepGoal from "~/components/onboarding/StepGoal.vue";
-import StepFasting from "~/components/onboarding/StepFasting.vue";
-import StepSummary from "~/components/onboarding/StepSummary.vue";
+import { useStepperNavigation } from "~/composables/useStepperNavigation";
+import { getOnboardingSteps } from "~/constants/onboardingSteps";
 
 definePageMeta({
   layout: "onboarding",
@@ -38,41 +36,36 @@ const router = useRouter();
 const toast = useToast();
 const user = useUserStore();
 
-const step = ref(0);
+const step = ref<number>(0);
 const stepRef = ref();
 const maxStep = 6;
 
-const steps = [
-  { title: "Welcome", icon: "mdi:hand-wave", component: StepWelcome },
-  { title: "Weight", icon: "mdi:scale-bathroom", component: StepWeight },
-  {
-    title: "Basic Info",
-    icon: "mdi:account-details",
-    component: StepBasicInfo,
-  },
-  { title: "Activity", icon: "mdi:run", component: StepActivity },
-  { title: "Goal", icon: "mdi:bullseye-arrow", component: StepGoal },
-  { title: "Fasting", icon: "mdi:timer-outline", component: StepFasting },
-  {
-    title: "Summary",
-    icon: "mdi:clipboard-check-outline",
-    component: StepSummary,
-  },
-];
-
-const stepItems = steps.map(({ title, icon }) => ({ title, icon }));
-const currentStepComponent = computed(() => steps[step.value]!.component);
-
 const isStepValid = useOnboardingValidation(user);
+const stepConfig = getOnboardingSteps(stepRef);
+
+const stepItems = computed(() =>
+  stepConfig.map(({ title, icon }, index) => ({
+    title,
+    icon,
+    disabled:
+      index > step.value &&
+      !Array.from({ length: index }).every((_, i) => isStepValid(i)),
+  })),
+);
+
+const currentStepComponent = computed(() => stepConfig[step.value]!.component);
 const canContinue = computed(() => isStepValid(step.value));
 
-useAutoStepFocus(step, {
-  1: computed(() => stepRef.value?.weightInput),
-  2: computed(() => stepRef.value?.ageInput),
-  3: computed(() => stepRef.value?.activityRef),
-  4: computed(() => stepRef.value?.goalRef),
-  5: computed(() => stepRef.value?.fastingRef),
-});
+useAutoStepFocus(
+  step,
+  stepConfig.reduce(
+    (map, step, index) => {
+      if (step.focusRef) map[index] = computed(step.focusRef);
+      return map;
+    },
+    {} as Record<number, Ref<any>>,
+  ),
+);
 
 const prevStep = () => {
   step.value--;
@@ -90,6 +83,8 @@ const nextStep = () => {
     router.push("/");
   }
 };
+
+const handleStepClick = useStepperNavigation(step, (s) => !!isStepValid(s));
 
 onMounted(() => {
   user.loadProgress();

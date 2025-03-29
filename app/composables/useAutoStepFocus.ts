@@ -29,7 +29,7 @@ export function useAutoStepFocus(
       }
 
       const focusable = ref?.$el?.querySelector?.(
-        "[tabindex], input, button, [data-focusable]",
+        'button[role="radio"][tabindex="0"], input, button, [tabindex], [data-focusable]',
       );
       if (focusable && typeof focusable.focus === "function") {
         focusable.focus();
