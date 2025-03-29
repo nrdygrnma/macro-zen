@@ -1,22 +1,21 @@
 import type { AuthUser } from "~/types/auth";
 
-export default defineNuxtRouteMiddleware(() => {
+export default defineNuxtRouteMiddleware((to, from) => {
   const { loggedIn, user } = useUserSession();
-  const route = useRoute();
 
-  const isClient = import.meta.client;
-  const isLoggedIn = loggedIn.value;
-  const typedUser = user.value as AuthUser;
+  if (!import.meta.client || !loggedIn.value) return;
 
-  if (!isClient || !isLoggedIn) return;
+  const typedUser = user.value as AuthUser | null;
 
   const onboardingDone = typedUser?.onboardingDone === true;
-  const isOnboardingRoute = route.path === "/onboarding";
+  const isOnboardingRoute = to.path === "/onboarding";
 
+  // Redirect user to onboarding if it's not completed yet
   if (!onboardingDone && !isOnboardingRoute) {
     return navigateTo("/onboarding");
   }
 
+  // Prevent accessing onboarding again after it's completed
   if (onboardingDone && isOnboardingRoute) {
     return navigateTo("/");
   }

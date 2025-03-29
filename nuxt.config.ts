@@ -9,7 +9,19 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "nuxt-auth-utils",
     "@prisma/nuxt",
+    "nuxt-echarts",
   ],
+  echarts: {
+    renderer: ["svg", "canvas"],
+    charts: ["BarChart", "LineChart", "PieChart"],
+    components: [
+      "TitleComponent",
+      "TooltipComponent",
+      "GridComponent",
+      "DatasetComponent",
+    ],
+    features: ["LabelLayout", "UniversalTransition"],
+  },
 
   css: ["~/assets/css/main.css"],
 
