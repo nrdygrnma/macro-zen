@@ -19,7 +19,13 @@
 </template>
 
 <script lang="ts" setup>
-import { toTitleCase } from "~/utils/textUtils";
-
 const user = useUserStore();
+
+onBeforeRouteLeave((to, from, next) => {
+  next();
+
+  setTimeout(() => {
+    user.reset();
+  }, 300);
+});
 </script>

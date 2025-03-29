@@ -87,7 +87,6 @@ const nextStep = () => {
       description: "Setup complete!",
       color: "success",
     });
-    user.reset();
     router.push("/");
   }
 };
