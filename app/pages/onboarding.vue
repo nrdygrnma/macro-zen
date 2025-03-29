@@ -198,7 +198,7 @@ const nextStep = () => {
     toast.add({
       title: "Welcome to MacroZen 🎉",
       description: "Setup complete!",
-      color: "green",
+      color: "success",
     });
     localStorage.removeItem("onboarding-progress");
     router.push("/");
