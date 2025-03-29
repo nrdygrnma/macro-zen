@@ -23,9 +23,9 @@
 </template>
 
 <script lang="ts" setup>
-import { useAutoStepFocus } from "~/composables/useAutoStepFocus";
-import { useOnboardingValidation } from "~/composables/useOnboardingValidation";
-import { useStepperNavigation } from "~/composables/useStepperNavigation";
+import { useAutoStepFocus } from "~/composables/onboarding/useAutoStepFocus";
+import { useOnboardingValidation } from "~/composables/onboarding/useOnboardingValidation";
+import { useStepperNavigation } from "~/composables/onboarding/useStepperNavigation";
 import { getOnboardingSteps } from "~/constants/onboardingSteps";
 
 definePageMeta({

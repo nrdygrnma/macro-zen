@@ -3,4 +3,8 @@
     <h1 class="text-4xl text-pink-600 font-light">Dashboard</h1>
   </div>
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+definePageMeta({
+  middleware: ["authenticated"],
+});
+</script>
