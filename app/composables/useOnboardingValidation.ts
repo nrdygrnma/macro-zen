@@ -1,3 +1,10 @@
+/**
+ * Composable that returns a function to validate each onboarding step
+ * based on the user's filled-in data.
+ *
+ * @param user - The Pinia user store instance containing onboarding form state.
+ * @returns A function that takes a step number and returns whether the step is valid.
+ */
 export function useOnboardingValidation(user: ReturnType<typeof useUserStore>) {
   return (step: number) => {
     if (step === 0) return true;

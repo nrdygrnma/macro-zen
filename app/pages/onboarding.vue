@@ -19,18 +19,28 @@
 </template>
 
 <script lang="ts" setup>
+import { useAutoStepFocus } from "~/composables/useAutoStepFocus";
+import { useOnboardingValidation } from "~/composables/useOnboardingValidation";
+
 import StepWelcome from "~/components/onboarding/StepWelcome.vue";
 import StepWeight from "~/components/onboarding/StepWeight.vue";
 import StepBasicInfo from "~/components/onboarding/StepBasicInfo.vue";
 import StepActivity from "~/components/onboarding/StepActivity.vue";
 import StepGoal from "~/components/onboarding/StepGoal.vue";
-import StepSummary from "~/components/onboarding/StepSummary.vue";
 import StepFasting from "~/components/onboarding/StepFasting.vue";
-import { useOnboardingValidation } from "~/composables/useOnboardingValidation";
+import StepSummary from "~/components/onboarding/StepSummary.vue";
 
 definePageMeta({
   layout: "onboarding",
 });
+
+const router = useRouter();
+const toast = useToast();
+const user = useUserStore();
+
+const step = ref(0);
+const stepRef = ref();
+const maxStep = 6;
 
 const steps = [
   { title: "Welcome", icon: "mdi:hand-wave", component: StepWelcome },
@@ -50,16 +60,11 @@ const steps = [
   },
 ];
 
-const toast = useToast();
-const router = useRouter();
-const user = useUserStore();
-
-const step = ref(0);
-const stepRef = ref();
-const maxStep = steps.length - 1;
+const stepItems = steps.map(({ title, icon }) => ({ title, icon }));
+const currentStepComponent = computed(() => steps[step.value]!.component);
 
 const isStepValid = useOnboardingValidation(user);
-const stepItems = steps.map(({ title, icon }) => ({ title, icon }));
+const canContinue = computed(() => isStepValid(step.value));
 
 useAutoStepFocus(step, {
   1: computed(() => stepRef.value?.weightInput),
@@ -68,9 +73,6 @@ useAutoStepFocus(step, {
   4: computed(() => stepRef.value?.goalRef),
   5: computed(() => stepRef.value?.fastingRef),
 });
-
-const canContinue = computed(() => isStepValid(step.value));
-const currentStepComponent = computed(() => steps[step.value]!.component);
 
 const prevStep = () => {
   step.value--;
@@ -90,6 +92,10 @@ const nextStep = () => {
   }
 };
 
+onMounted(() => {
+  user.loadProgress();
+});
+
 watch(
   [step, user],
   () => {
@@ -97,8 +103,4 @@ watch(
   },
   { deep: true },
 );
-
-onMounted(() => {
-  user.loadProgress();
-});
 </script>
