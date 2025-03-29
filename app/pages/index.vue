@@ -5,6 +5,6 @@
 </template>
 <script lang="ts" setup>
 definePageMeta({
-  middleware: ["authenticated"],
+  middleware: ["authenticated", "onboarding-required"],
 });
 </script>

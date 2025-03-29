@@ -27,6 +27,7 @@
     "zod": "^3.24.2"
   },
   "devDependencies": {
+    "@iconify-json/mdi": "^1.2.3",
     "prettier": "^3.5.3"
   }
 }

@@ -29,7 +29,6 @@ const items = ref([
     { label: "Log Food", icon: "lucide:utensils", to: "/food" },
     { label: "Weight", icon: "lucide:weight", to: "/weight" },
     { label: "Fasting", icon: "lucide:timer", to: "/fasting" },
-    { label: "Settings", icon: "lucide:settings", to: "/settings" },
   ],
 ]);
 </script>

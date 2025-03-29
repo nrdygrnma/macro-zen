@@ -1,4 +1,4 @@
-import type { UserOnboardingData } from "~/types";
+import type { UserOnboardingData } from "~/types/onboarding";
 
 export const useUserStore = defineStore("user", () => {
   const weight = ref<number | null>(null);
@@ -67,6 +67,27 @@ export const useUserStore = defineStore("user", () => {
     localStorage.removeItem("onboarding-progress");
   };
 
+  const submitOnboarding = async () => {
+    try {
+      await useFetch("/api/user/onboarding", {
+        method: "POST",
+        body: {
+          weight: weight.value,
+          goalWeight: goalWeight.value,
+          age: age.value,
+          height: height.value,
+          sex: sex.value,
+          activity: activity.value,
+          goal: goal.value,
+          fasting: fasting.value,
+          fastingMethod: fastingMethod.value,
+        },
+      });
+    } catch (error) {
+      throw new Error("Failed to submit onboarding data");
+    }
+  };
+
   return {
     weight,
     goalWeight,
@@ -82,5 +103,6 @@ export const useUserStore = defineStore("user", () => {
     loadProgress,
     reset,
     getData,
+    submitOnboarding,
   };
 });

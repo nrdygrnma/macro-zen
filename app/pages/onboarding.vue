@@ -1,7 +1,5 @@
 <template>
-  <UContainer
-    class="w-full max-w-xl mx-auto p-8 border border-gray-200 rounded-lg"
-  >
+  <UContainer class="w-full p-8 border border-gray-200 rounded-lg">
     <UStepper
       :items="stepItems"
       :model-value="step"
@@ -71,16 +69,27 @@ const prevStep = () => {
   step.value--;
 };
 
-const nextStep = () => {
+const nextStep = async () => {
   if (step.value < maxStep) {
     step.value++;
   } else {
-    toast.add({
-      title: "Welcome to MacroZen 🎉",
-      description: "Setup complete!",
-      color: "success",
-    });
-    router.push("/");
+    try {
+      await user.submitOnboarding();
+
+      toast.add({
+        title: "Welcome to MacroZen 🎉",
+        description: "Setup complete!",
+        color: "success",
+      });
+
+      await router.push("/");
+    } catch (error) {
+      toast.add({
+        title: "Error",
+        description: "Could not save onboarding data",
+        color: "error",
+      });
+    }
   }
 };
 
