@@ -5,11 +5,12 @@ const bodySchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
   name: z.string().optional(),
+  avatar: z.string().optional(),
 });
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event);
-  const { email, password, name } = bodySchema.parse(body);
+  const { email, password, name, avatar } = bodySchema.parse(body);
 
   const existingUser = await prisma.user.findUnique({
     where: { email },
@@ -29,6 +30,7 @@ export default defineEventHandler(async (event) => {
       email,
       password: hashedPassword,
       name,
+      avatar,
     },
   });
 
