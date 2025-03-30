@@ -5,8 +5,13 @@ export const useWeightStore = defineStore("weight", () => {
   const loading = ref(false);
 
   const fetchWeights = async () => {
-    const { data } = await useFetch<WeightEntry[]>("/api/weight-history");
-    weights.value = data.value || [];
+    loading.value = true;
+    try {
+      const { data } = await useFetch<WeightEntry[]>("/api/weight-history");
+      weights.value = data.value ?? [];
+    } finally {
+      loading.value = false;
+    }
   };
 
   const addWeight = async (weight: number, date?: string | Date) => {
@@ -19,7 +24,7 @@ export const useWeightStore = defineStore("weight", () => {
         },
       });
       if (newEntry.value) {
-        weights.value.unshift(newEntry.value);
+        weights.value!.unshift(newEntry.value);
       }
     } catch (error) {
       console.error("Failed to add weight:", error);

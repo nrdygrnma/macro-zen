@@ -1,9 +1,11 @@
 <template>
   <UCard>
-    <v-chart v-if="hasData" :option="chartOptions" autoresize class="chart" />
-    <div v-else class="text-center text-sm text-gray-500 py-12">
-      No weight entries yet.
-    </div>
+    <template v-if="weightStore.loading">
+      <div class="text-center py-12 text-gray-400">Loading chart…</div>
+    </template>
+    <template v-else>
+      <v-chart :option="chartOptions" autoresize class="chart" />
+    </template>
   </UCard>
 </template>
 
@@ -11,13 +13,13 @@
 import { useWeightStore } from "~/stores/weight";
 
 const weightStore = useWeightStore();
+await weightStore.fetchWeights();
 
 const chartOptions = computed(() => {
   const labels = weightStore.weights.map((entry) =>
     new Date(entry.date).toLocaleDateString(),
   );
   const data = weightStore.weights.map((entry) => entry.weight);
-
   return {
     title: {
       text: "Weight History",
@@ -44,13 +46,15 @@ const chartOptions = computed(() => {
   };
 });
 
-const hasData = computed(() => weightStore.weights.length > 0);
-
 onMounted(async () => {
-  if (!weightStore.weights.length) {
-    await weightStore.fetchWeights();
-  }
+  await weightStore.fetchWeights();
 });
+
+watch(
+  () => weightStore.weights,
+  (val) => console.log("Weights in chart:", val),
+  { immediate: true, deep: true },
+);
 </script>
 
 <style scoped>
