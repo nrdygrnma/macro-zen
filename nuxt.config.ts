@@ -11,6 +11,7 @@ export default defineNuxtConfig({
     "@prisma/nuxt",
     "nuxt-echarts",
   ],
+
   echarts: {
     renderer: ["svg", "canvas"],
     charts: ["BarChart", "LineChart", "PieChart"],
